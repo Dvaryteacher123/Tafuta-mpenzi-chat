@@ -1,0 +1,1663 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>💕 Sign Up - TAFUTA MPENZI WAKO</title>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    
+    <style>
+        /* ============================================
+           CSS - SIGNUP PAGE (KIFAHARI)
+           ============================================ */
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #FF6B8A;
+            --primary-dark: #E85577;
+            --primary-light: #FF8FA8;
+            --secondary: #FFB3C6;
+            --dark: #1A1A2E;
+            --dark-card: #2A2A4A;
+            --dark-surface: #222244;
+            --text-light: #FFFFFF;
+            --text-dark: #1A1A2E;
+            --text-gray: #B0B0C8;
+            --text-muted: #6B6B8A;
+            --success: #4CAF50;
+            --danger: #FF4444;
+            --warning: #FFC107;
+            --shadow: 0 8px 32px rgba(0,0,0,0.3);
+            --shadow-glow: 0 0 60px rgba(255,107,138,0.12);
+            --radius: 20px;
+            --transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        [data-theme="light"] {
+            --dark: #FFFFFF;
+            --dark-card: #F5F5F5;
+            --dark-surface: #EEEEEE;
+            --text-light: #1A1A2E;
+            --text-dark: #1A1A2E;
+            --text-gray: #666688;
+            --text-muted: #9999AA;
+            --shadow: 0 8px 32px rgba(0,0,0,0.08);
+            --shadow-glow: 0 0 60px rgba(255,107,138,0.06);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--dark);
+            color: var(--text-light);
+            transition: var(--transition);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #1A1A2E 0%, #2D1B3D 50%, #1A1A2E 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        [data-theme="light"] body {
+            background: linear-gradient(135deg, #FFF5F7 0%, #FFE8EE 50%, #FFF5F7 100%);
+        }
+
+        /* Animated Background */
+        body::before {
+            content: '💕';
+            position: absolute;
+            font-size: 400px;
+            opacity: 0.03;
+            top: -150px;
+            right: -150px;
+            transform: rotate(25deg);
+            animation: floatHeart 8s ease-in-out infinite;
+        }
+
+        body::after {
+            content: '❤️';
+            position: absolute;
+            font-size: 250px;
+            opacity: 0.02;
+            bottom: -100px;
+            left: -100px;
+            transform: rotate(-15deg);
+            animation: floatHeart 10s ease-in-out infinite reverse;
+        }
+
+        @keyframes floatHeart {
+            0%, 100% { transform: rotate(25deg) translateY(0px); }
+            50% { transform: rotate(25deg) translateY(-30px); }
+        }
+
+        /* Floating Particles */
+        .particles {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            font-size: 20px;
+            opacity: 0.08;
+            animation: particleFloat 15s linear infinite;
+        }
+
+        .particle:nth-child(1) { left: 5%; animation-duration: 18s; font-size: 28px; }
+        .particle:nth-child(2) { left: 20%; animation-duration: 22s; font-size: 22px; animation-delay: 2s; }
+        .particle:nth-child(3) { left: 40%; animation-duration: 16s; font-size: 34px; animation-delay: 4s; }
+        .particle:nth-child(4) { left: 60%; animation-duration: 20s; font-size: 26px; animation-delay: 1s; }
+        .particle:nth-child(5) { left: 78%; animation-duration: 24s; font-size: 30px; animation-delay: 3s; }
+        .particle:nth-child(6) { left: 30%; animation-duration: 19s; font-size: 20px; animation-delay: 5s; }
+        .particle:nth-child(7) { left: 50%; animation-duration: 21s; font-size: 24px; animation-delay: 2.5s; }
+        .particle:nth-child(8) { left: 70%; animation-duration: 17s; font-size: 32px; animation-delay: 4.5s; }
+
+        @keyframes particleFloat {
+            0% { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.08; }
+            90% { opacity: 0.08; }
+            100% { transform: translateY(-10vh) rotate(720deg); opacity: 0; }
+        }
+
+        /* ===== SIGNUP WRAPPER ===== */
+        .signup-wrapper {
+            width: 100%;
+            max-width: 560px;
+            position: relative;
+            z-index: 2;
+            animation: slideUp 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px) scale(0.96);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .signup-container {
+            background: var(--dark-card);
+            border-radius: var(--radius);
+            padding: 40px 35px 35px;
+            box-shadow: var(--shadow), var(--shadow-glow);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.05);
+            max-height: 95vh;
+            overflow-y: auto;
+        }
+
+        [data-theme="light"] .signup-container {
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        /* Decorative Border Gradient */
+        .signup-container::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: var(--radius);
+            padding: 2px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light), var(--secondary), var(--primary));
+            background-size: 300% 300%;
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            animation: borderGlow 4s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes borderGlow {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        /* Decorative Hearts */
+        .signup-container .deco {
+            position: absolute;
+            font-size: 50px;
+            opacity: 0.03;
+            pointer-events: none;
+        }
+
+        .signup-container .deco.tl {
+            top: 10px;
+            left: 10px;
+            transform: rotate(-15deg);
+        }
+
+        .signup-container .deco.br {
+            bottom: 10px;
+            right: 10px;
+            transform: rotate(25deg);
+        }
+
+        /* Scrollbar */
+        .signup-container::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .signup-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .signup-container::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        /* ===== HEADER ===== */
+        .signup-header {
+            text-align: center;
+            margin-bottom: 28px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .signup-header .logo {
+            font-size: 56px;
+            display: block;
+            margin-bottom: 8px;
+            animation: pulseHeart 2.5s ease-in-out infinite;
+        }
+
+        @keyframes pulseHeart {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.05) rotate(-3deg); }
+            75% { transform: scale(1.05) rotate(3deg); }
+        }
+
+        .signup-header h1 {
+            font-size: 26px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .signup-header p {
+            color: var(--text-gray);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        /* ===== PROGRESS STEPS ===== */
+        .progress-steps {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 28px;
+            position: relative;
+            z-index: 2;
+            flex-wrap: wrap;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--text-gray);
+            padding: 6px 16px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.04);
+            transition: var(--transition);
+            border: 1px solid transparent;
+        }
+
+        [data-theme="light"] .step {
+            background: rgba(0,0,0,0.03);
+        }
+
+        .step.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 4px 20px rgba(255,107,138,0.3);
+        }
+
+        .step .num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.15);
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .step.active .num {
+            background: rgba(255,255,255,0.25);
+        }
+
+        /* ===== FORM ===== */
+        .signup-form {
+            position: relative;
+            z-index: 2;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-light);
+            transition: var(--transition);
+        }
+
+        [data-theme="light"] .form-group label {
+            color: var(--text-dark);
+        }
+
+        .form-group label .required {
+            color: var(--danger);
+            margin-left: 2px;
+        }
+
+        .form-group .label-icon {
+            margin-right: 6px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.04);
+            border: 2px solid rgba(255,255,255,0.06);
+            transition: var(--transition);
+            overflow: hidden;
+        }
+
+        [data-theme="light"] .input-wrapper {
+            background: rgba(0,0,0,0.03);
+            border-color: rgba(0,0,0,0.06);
+        }
+
+        .input-wrapper:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(255,107,138,0.10);
+            background: rgba(255,107,138,0.02);
+        }
+
+        .input-wrapper .input-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+            color: var(--text-muted);
+            transition: var(--transition);
+            pointer-events: none;
+        }
+
+        .input-wrapper:focus-within .input-icon {
+            color: var(--primary);
+        }
+
+        .input-wrapper input,
+        .input-wrapper select,
+        .input-wrapper textarea {
+            width: 100%;
+            padding: 13px 14px 13px 44px;
+            border: none;
+            background: transparent;
+            color: var(--text-light);
+            font-size: 14px;
+            font-family: inherit;
+            transition: var(--transition);
+            outline: none;
+        }
+
+        [data-theme="light"] .input-wrapper input,
+        [data-theme="light"] .input-wrapper select,
+        [data-theme="light"] .input-wrapper textarea {
+            color: var(--text-dark);
+        }
+
+        .input-wrapper input::placeholder,
+        .input-wrapper textarea::placeholder {
+            color: var(--text-muted);
+            opacity: 0.7;
+        }
+
+        .input-wrapper select {
+            appearance: none;
+            cursor: pointer;
+            padding-right: 36px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23B0B0C8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+        }
+
+        .input-wrapper select option {
+            background: var(--dark);
+            color: var(--text-light);
+        }
+
+        [data-theme="light"] .input-wrapper select option {
+            background: var(--dark-card);
+            color: var(--text-dark);
+        }
+
+        .input-wrapper textarea {
+            resize: vertical;
+            min-height: 60px;
+            padding-top: 13px;
+        }
+
+        /* Form Error/Success */
+        .form-error {
+            color: var(--danger);
+            font-size: 12px;
+            margin-top: 6px;
+            display: none;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .form-error.visible {
+            display: flex;
+        }
+
+        .form-group.has-error .input-wrapper {
+            border-color: var(--danger);
+            box-shadow: 0 0 0 4px rgba(255,68,68,0.08);
+        }
+
+        .form-group.has-success .input-wrapper {
+            border-color: var(--success);
+        }
+
+        /* ===== INTERESTS ===== */
+        .interests-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 4px 0;
+        }
+
+        .interest-tag {
+            padding: 6px 16px;
+            border-radius: 20px;
+            border: 2px solid rgba(255,255,255,0.08);
+            background: transparent;
+            color: var(--text-gray);
+            font-size: 13px;
+            cursor: pointer;
+            transition: var(--transition);
+            user-select: none;
+        }
+
+        [data-theme="light"] .interest-tag {
+            border-color: rgba(0,0,0,0.08);
+        }
+
+        .interest-tag:hover {
+            border-color: var(--primary-light);
+            color: var(--text-light);
+        }
+
+        .interest-tag.selected {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 16px rgba(255,107,138,0.25);
+        }
+
+        /* ===== PROFILE PICTURE ===== */
+        .profile-upload {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 10px 16px;
+            border: 2px dashed rgba(255,255,255,0.10);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        [data-theme="light"] .profile-upload {
+            border-color: rgba(0,0,0,0.08);
+        }
+
+        .profile-upload:hover {
+            border-color: var(--primary);
+            background: rgba(255,107,138,0.04);
+        }
+
+        .profile-upload .preview {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--dark-surface);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        [data-theme="light"] .profile-upload .preview {
+            background: var(--dark-surface);
+        }
+
+        .profile-upload .preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-upload .upload-text {
+            font-size: 13px;
+            color: var(--text-gray);
+        }
+
+        .profile-upload .upload-text strong {
+            color: var(--primary);
+        }
+
+        /* ===== PASSWORD STRENGTH ===== */
+        .password-strength {
+            margin-top: 6px;
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .strength-bar {
+            flex: 1;
+            height: 4px;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.08);
+            overflow: hidden;
+        }
+
+        [data-theme="light"] .strength-bar {
+            background: rgba(0,0,0,0.08);
+        }
+
+        .strength-bar .fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: var(--transition);
+            width: 0%;
+        }
+
+        .strength-bar .fill.weak { width: 25%; background: var(--danger); }
+        .strength-bar .fill.medium { width: 50%; background: var(--warning); }
+        .strength-bar .fill.strong { width: 75%; background: #FF9800; }
+        .strength-bar .fill.very-strong { width: 100%; background: var(--success); }
+
+        .strength-text {
+            font-size: 11px;
+            color: var(--text-gray);
+            min-width: 60px;
+            text-align: right;
+        }
+
+        /* ===== TERMS ===== */
+        .terms-check {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .terms-check input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--primary);
+            margin-top: 2px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .terms-check label {
+            font-size: 13px;
+            color: var(--text-gray);
+            cursor: pointer;
+        }
+
+        .terms-check label a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .terms-check label a:hover {
+            text-decoration: underline;
+        }
+
+        /* ===== NAVIGATION BUTTONS ===== */
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 22px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .nav-buttons .btn-prev {
+            flex: 1;
+            padding: 14px;
+            border-radius: 12px;
+            border: 2px solid rgba(255,255,255,0.08);
+            background: transparent;
+            color: var(--text-gray);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 14px;
+        }
+
+        [data-theme="light"] .nav-buttons .btn-prev {
+            border-color: rgba(0,0,0,0.08);
+        }
+
+        .nav-buttons .btn-prev:hover {
+            background: rgba(255,255,255,0.05);
+            color: var(--text-light);
+        }
+
+        .nav-buttons .btn-next {
+            flex: 2;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 14px;
+        }
+
+        .nav-buttons .btn-next:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(255,107,138,0.3);
+        }
+
+        .nav-buttons .btn-next:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .nav-buttons .btn-submit-form {
+            flex: 2;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, var(--success), #45a049);
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .nav-buttons .btn-submit-form:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(76,175,80,0.3);
+        }
+
+        .nav-buttons .btn-submit-form:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .nav-buttons .btn-submit-form .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .nav-buttons .btn-submit-form.loading .spinner {
+            display: block;
+        }
+
+        .nav-buttons .btn-submit-form.loading .btn-text {
+            display: none;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ===== LOGIN LINK ===== */
+        .login-link {
+            text-align: center;
+            margin-top: 22px;
+            font-size: 14px;
+            color: var(--text-gray);
+        }
+
+        .login-link a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        /* ===== SUCCESS MESSAGE ===== */
+        .form-success {
+            text-align: center;
+            padding: 30px 20px;
+            display: none;
+        }
+
+        .form-success .icon {
+            font-size: 64px;
+            display: block;
+            margin-bottom: 16px;
+        }
+
+        .form-success h2 {
+            color: var(--success);
+            margin-bottom: 8px;
+        }
+
+        .form-success p {
+            color: var(--text-gray);
+            font-size: 15px;
+        }
+
+        .form-success .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .form-success .loading .spinner {
+            width: 36px;
+            height: 36px;
+            border: 3px solid rgba(255,255,255,0.08);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 16px 32px;
+            border-radius: var(--radius);
+            background: var(--dark-card);
+            color: var(--text-light);
+            box-shadow: var(--shadow);
+            z-index: 9999;
+            display: none;
+            max-width: 90%;
+            text-align: center;
+            animation: toastSlide 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+            border-left: 4px solid var(--success);
+        }
+
+        [data-theme="light"] .toast {
+            background: var(--dark-card);
+            color: var(--text-dark);
+        }
+
+        @keyframes toastSlide {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0) scale(1);
+            }
+        }
+
+        .toast.success { border-left-color: var(--success); }
+        .toast.error { border-left-color: var(--danger); }
+        .toast.warning { border-left-color: var(--warning); }
+
+        .toast.show { display: block; }
+
+        /* ===== SCROLL TOP ===== */
+        .scroll-top {
+            display: none;
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            z-index: 100;
+        }
+
+        .scroll-top:hover {
+            transform: translateY(-3px);
+        }
+
+        .scroll-top.visible {
+            display: block;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 600px) {
+            .signup-container {
+                padding: 28px 20px 25px;
+                max-height: none;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .signup-header h1 {
+                font-size: 22px;
+            }
+
+            .signup-header .logo {
+                font-size: 44px;
+            }
+
+            .progress-steps {
+                gap: 6px;
+            }
+
+            .step {
+                font-size: 10px;
+                padding: 4px 10px;
+            }
+
+            .step .num {
+                width: 18px;
+                height: 18px;
+                font-size: 9px;
+            }
+
+            .nav-buttons {
+                flex-direction: column;
+            }
+
+            .nav-buttons .btn-prev,
+            .nav-buttons .btn-next,
+            .nav-buttons .btn-submit-form {
+                flex: 1;
+            }
+
+            .interests-container {
+                gap: 6px;
+            }
+
+            .interest-tag {
+                font-size: 11px;
+                padding: 4px 12px;
+            }
+
+            .profile-upload {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .particles {
+                display: none;
+            }
+
+            .input-wrapper input,
+            .input-wrapper select,
+            .input-wrapper textarea {
+                font-size: 13px;
+                padding: 12px 12px 12px 40px;
+            }
+
+            .input-wrapper .input-icon {
+                font-size: 14px;
+                left: 12px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .signup-container {
+                padding: 20px 14px 18px;
+            }
+
+            .signup-header .logo {
+                font-size: 36px;
+            }
+
+            .signup-header h1 {
+                font-size: 18px;
+            }
+
+            .step {
+                font-size: 9px;
+                padding: 3px 8px;
+            }
+
+            .step .num {
+                width: 16px;
+                height: 16px;
+                font-size: 8px;
+            }
+        }
+
+        /* ===== SCROLLBAR GLOBAL ===== */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================
+    PARTICLES BACKGROUND
+    ============================================ -->
+    <div class="particles">
+        <span class="particle">💕</span>
+        <span class="particle">❤️</span>
+        <span class="particle">✨</span>
+        <span class="particle">💖</span>
+        <span class="particle">🌸</span>
+        <span class="particle">💗</span>
+        <span class="particle">🌟</span>
+        <span class="particle">💝</span>
+    </div>
+
+    <!-- ============================================
+    TOAST
+    ============================================ -->
+    <div id="toast" class="toast"></div>
+
+    <!-- ============================================
+    SCROLL TO TOP BUTTON
+    ============================================ -->
+    <button class="scroll-top" id="scrollTopBtn" onclick="scrollToTop()">⬆</button>
+
+    <!-- ============================================
+    SIGNUP WRAPPER
+    ============================================ -->
+    <div class="signup-wrapper">
+
+        <div class="signup-container" id="signupContainer">
+            
+            <!-- Decorations -->
+            <span class="deco tl">💕</span>
+            <span class="deco br">💕</span>
+
+            <!-- Header -->
+            <div class="signup-header">
+                <span class="logo">💕</span>
+                <h1>TAFUTA MPENZI WAKO</h1>
+                <p>Unda akaunti yako na anza kutafuta mpenzi wako!</p>
+            </div>
+
+            <!-- Progress Steps -->
+            <div class="progress-steps">
+                <div class="step active" id="step1">
+                    <span class="num">1</span> Personal
+                </div>
+                <div class="step" id="step2">
+                    <span class="num">2</span> Profile
+                </div>
+                <div class="step" id="step3">
+                    <span class="num">3</span> Interests
+                </div>
+            </div>
+
+            <!-- Form -->
+            <form class="signup-form" id="signupForm" onsubmit="handleSignup(event)">
+                
+                <!-- Step 1: Personal Info -->
+                <div id="step1Content">
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label><span class="label-icon">👤</span> Full Name <span class="required">*</span></label>
+                            <div class="input-wrapper">
+                                <span class="input-icon">📝</span>
+                                <input type="text" id="fullName" placeholder="Mfano: John Doe" required>
+                            </div>
+                            <div class="form-error" id="fullNameError">⚠️ Tafadhali jaza jina lako kamili.</div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><span class="label-icon">@</span> Username <span class="required">*</span></label>
+                            <div class="input-wrapper">
+                                <span class="input-icon">@</span>
+                                <input type="text" id="username" placeholder="john_doe" required>
+                            </div>
+                            <div class="form-error" id="usernameError">⚠️ Username inahitajika.</div>
+                        </div>
+                        <div class="form-group">
+                            <label><span class="label-icon">📧</span> Email <span class="required">*</span></label>
+                            <div class="input-wrapper">
+                                <span class="input-icon">✉️</span>
+                                <input type="email" id="email" placeholder="john@example.com" required>
+                            </div>
+                            <div class="form-error" id="emailError">⚠️ Tafadhali ingiza email sahihi.</div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><span class="label-icon">📱</span> Phone Number</label>
+                            <div class="input-wrapper">
+                                <span class="input-icon">📞</span>
+                                <input type="tel" id="phone" placeholder="0712345678">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label><span class="label-icon">🎂</span> Date of Birth <span class="required">*</span></label>
+                            <div class="input-wrapper">
+                                <span class="input-icon">📅</span>
+                                <input type="date" id="dob" required>
+                            </div>
+                            <div class="form-error" id="dobError">⚠️ Lazima uwe na umri wa miaka 18+.</div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><span class="label-icon">🔒</span> Password <span class="required">*</span></label>
+                            <div class="input-wrapper">
+                                <span class="input-icon">🔑</span>
+                                <input type="password" id="password" placeholder="Ingiza password" required>
+                            </div>
+                            <div class="password-strength">
+                                <div class="strength-bar"><div class="fill" id="strengthFill"></div></div>
+                                <span class="strength-text" id="strengthText">Weak</span>
+                            </div>
+                            <div class="form-error" id="passwordError">⚠️ Password lazima iwe na angalau herufi 8.</div>
+                        </div>
+                        <div class="form-group">
+                            <label><span class="label-icon">✅</span> Confirm Password <span class="required">*</span></label>
+                            <div class="input-wrapper">
+                                <span class="input-icon">🔐</span>
+                                <input type="password" id="confirmPassword" placeholder="Thibitisha password" required>
+                            </div>
+                            <div class="form-error" id="confirmError">⚠️ Password hazilingani.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Profile -->
+                <div id="step2Content" style="display:none;">
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label><span class="label-icon">🖼️</span> Profile Picture</label>
+                            <div class="profile-upload" onclick="document.getElementById('profilePicInput').click()">
+                                <div class="preview" id="profilePreview">👤</div>
+                                <div class="upload-text">
+                                    <strong>Bonyeza kupakia picha</strong><br>
+                                    <span>PNG, JPG hadi 5MB</span>
+                                </div>
+                                <input type="file" id="profilePicInput" accept="image/*" style="display:none;" onchange="handleProfilePic(event)">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><span class="label-icon">⚧️</span> Gender <span class="required">*</span></label>
+                            <div class="input-wrapper">
+                                <span class="input-icon">👤</span>
+                                <select id="gender" required>
+                                    <option value="">Chagua</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                    <option value="Prefer not to say">Prefer not to say</option>
+                                </select>
+                            </div>
+                            <div class="form-error" id="genderError">⚠️ Tafadhali chagua jinsia.</div>
+                        </div>
+                        <div class="form-group">
+                            <label><span class="label-icon">📍</span> Location</label>
+                            <div class="input-wrapper">
+                                <span class="input-icon">🌍</span>
+                                <input type="text" id="location" placeholder="Mfano: Dar es Salaam">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label><span class="label-icon">📝</span> Bio</label>
+                            <div class="input-wrapper">
+                                <span class="input-icon">✍️</span>
+                                <textarea id="bio" placeholder="Andika kuhusu wewe mwenyewe... (max 200 characters)" maxlength="200"></textarea>
+                            </div>
+                            <div style="text-align:right;font-size:12px;color:var(--text-gray);"><span id="bioCount">0</span>/200</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Interests -->
+                <div id="step3Content" style="display:none;">
+                    <div class="form-group full-width">
+                        <label><span class="label-icon">❤️</span> Select Your Interests</label>
+                        <p style="font-size:13px;color:var(--text-gray);margin-bottom:10px;">Chagua angalau moja</p>
+                        <div class="interests-container" id="interestsContainer">
+                            <span class="interest-tag" onclick="toggleInterest(this)">💕 Romance</span>
+                            <span class="interest-tag" onclick="toggleInterest(this)">🎵 Music</span>
+                            <span class="interest-tag" onclick="toggleInterest(this)">📚 Reading</span>
+                            <span class="interest-tag" onclick="toggleInterest(this)">🏃 Sports</span>
+                            <span class="interest-tag" onclick="toggleInterest(this)">🎮 Gaming</span>
+                            <span class="interest-tag" onclick="toggleInterest(this)">🎨 Art</span>
+                            <span class="interest-tag" onclick="toggleInterest(this)">✈️ Travel</span>
+                            <span class="interest-tag" onclick="toggleInterest(this)">🍳 Cooking</span>
+                            <span class="interest-tag" onclick="toggleInterest(this)">🎬 Movies</span>
+                            <span class="interest-tag" onclick="toggleInterest(this)">📸 Photography</span>
+                            <span class="interest-tag" onclick="toggleInterest(this)">🧘 Yoga</span>
+                            <span class="interest-tag" onclick="toggleInterest(this)">🌿 Nature</span>
+                            <span class="interest-tag" onclick="toggleInterest(this)">💼 Business</span>
+                            <span class="interest-tag" onclick="toggleInterest(this)">🎭 Theatre</span>
+                            <span class="interest-tag" onclick="toggleInterest(this)">🐾 Pets</span>
+                            <span class="interest-tag" onclick="toggleInterest(this)">🏖️ Beach</span>
+                        </div>
+                        <div class="form-error" id="interestsError">⚠️ Tafadhali chagua angalau interest moja.</div>
+                    </div>
+
+                    <div class="terms-check">
+                        <input type="checkbox" id="terms" required>
+                        <label for="terms">
+                            Ninakubali <a href="#" onclick="event.preventDefault()">Terms of Service</a> na 
+                            <a href="#" onclick="event.preventDefault()">Privacy Policy</a> 
+                            <span class="required">*</span>
+                        </label>
+                    </div>
+                    <div class="form-error" id="termsError">⚠️ Tafadhali kubali Terms and Conditions.</div>
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div class="nav-buttons">
+                    <button type="button" class="btn-prev" id="prevBtn" style="display:none;" onclick="prevStep()">
+                        ← Nyuma
+                    </button>
+                    <button type="button" class="btn-next" id="nextBtn" onclick="nextStep()">
+                        Endelea →
+                    </button>
+                    <button type="submit" class="btn-submit-form" id="submitBtn" style="display:none;">
+                        <span class="btn-text">🎉 Create Account</span>
+                        <span class="spinner"></span>
+                    </button>
+                </div>
+
+                <!-- Login Link -->
+                <div class="login-link">
+                    Tayari una akaunti? <a href="/login.html">💕 Ingia hapa</a>
+                </div>
+            </form>
+
+            <!-- Success Message -->
+            <div class="form-success" id="successMessage">
+                <span class="icon">🎉</span>
+                <h2>Account Created Successfully!</h2>
+                <p>Karibu 💕 TAFUTA MPENZI WAKO</p>
+                <p style="margin-top:8px;font-size:13px;color:var(--text-gray);">
+                    🎁 Umepewa Free Trial ya siku 3!
+                </p>
+                <p style="font-size:13px;color:var(--text-gray);">Unaelekezwa kwenye dashboard...</p>
+                <div class="loading"><div class="spinner"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+    JAVASCRIPT
+    ============================================ -->
+    <script>
+        // ============================================
+        // FIREBASE CONFIG
+        // ============================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyDvary9a7d0",
+            authDomain: "dvary-9a7d0.firebaseapp.com",
+            projectId: "dvary-9a7d0",
+            storageBucket: "dvary-9a7d0.appspot.com",
+            messagingSenderId: "100225041709142479199",
+            appId: "1:100225041709142479199:web:your-app-id"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        // ============================================
+        // STATE
+        // ============================================
+        let currentStep = 1;
+        let profilePicture = null;
+        let selectedInterests = [];
+        let isSubmitting = false;
+
+        // ============================================
+        // TOAST
+        // ============================================
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 4000);
+        }
+
+        // ============================================
+        // SCROLL TO TOP
+        // ============================================
+        function scrollToTop() {
+            document.getElementById('signupContainer').scrollTop = 0;
+        }
+
+        // Show/hide scroll button
+        document.getElementById('signupContainer').addEventListener('scroll', function() {
+            const btn = document.getElementById('scrollTopBtn');
+            if (this.scrollTop > 200) {
+                btn.classList.add('visible');
+            } else {
+                btn.classList.remove('visible');
+            }
+        });
+
+        // ============================================
+        // STEP NAVIGATION
+        // ============================================
+        function nextStep() {
+            if (!validateStep(currentStep)) return;
+
+            if (currentStep < 3) {
+                currentStep++;
+                updateSteps();
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                updateSteps();
+            }
+        }
+
+        function updateSteps() {
+            document.querySelectorAll('.step').forEach((el, index) => {
+                el.classList.toggle('active', index + 1 === currentStep);
+            });
+
+            document.getElementById('step1Content').style.display = currentStep === 1 ? 'block' : 'none';
+            document.getElementById('step2Content').style.display = currentStep === 2 ? 'block' : 'none';
+            document.getElementById('step3Content').style.display = currentStep === 3 ? 'block' : 'none';
+
+            document.getElementById('prevBtn').style.display = currentStep > 1 ? 'block' : 'none';
+            document.getElementById('nextBtn').style.display = currentStep < 3 ? 'block' : 'none';
+            document.getElementById('submitBtn').style.display = currentStep === 3 ? 'block' : 'none';
+
+            // Scroll to top
+            document.getElementById('signupContainer').scrollTop = 0;
+        }
+
+        // ============================================
+        // VALIDATION
+        // ============================================
+        function validateStep(step) {
+            let isValid = true;
+
+            if (step === 1) {
+                // Full Name
+                const fullName = document.getElementById('fullName').value.trim();
+                if (!fullName) {
+                    showError('fullNameError');
+                    isValid = false;
+                } else {
+                    hideError('fullNameError');
+                }
+
+                // Username
+                const username = document.getElementById('username').value.trim();
+                if (!username || username.length < 3) {
+                    showError('usernameError');
+                    isValid = false;
+                } else {
+                    hideError('usernameError');
+                }
+
+                // Email
+                const email = document.getElementById('email').value.trim();
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!email || !emailRegex.test(email)) {
+                    showError('emailError');
+                    isValid = false;
+                } else {
+                    hideError('emailError');
+                }
+
+                // Password
+                const password = document.getElementById('password').value;
+                if (password.length < 8) {
+                    showError('passwordError');
+                    isValid = false;
+                } else {
+                    hideError('passwordError');
+                }
+
+                // Confirm Password
+                const confirm = document.getElementById('confirmPassword').value;
+                if (password !== confirm) {
+                    showError('confirmError');
+                    isValid = false;
+                } else {
+                    hideError('confirmError');
+                }
+
+                // Date of Birth
+                const dob = document.getElementById('dob').value;
+                if (dob) {
+                    const age = calculateAge(new Date(dob));
+                    if (age < 18) {
+                        showError('dobError');
+                        isValid = false;
+                    } else {
+                        hideError('dobError');
+                    }
+                } else {
+                    showError('dobError');
+                    isValid = false;
+                }
+            }
+
+            if (step === 2) {
+                const gender = document.getElementById('gender').value;
+                if (!gender) {
+                    showError('genderError');
+                    isValid = false;
+                } else {
+                    hideError('genderError');
+                }
+            }
+
+            if (step === 3) {
+                if (selectedInterests.length === 0) {
+                    showError('interestsError');
+                    isValid = false;
+                } else {
+                    hideError('interestsError');
+                }
+
+                const terms = document.getElementById('terms').checked;
+                if (!terms) {
+                    showError('termsError');
+                    isValid = false;
+                } else {
+                    hideError('termsError');
+                }
+            }
+
+            return isValid;
+        }
+
+        function showError(id) {
+            const el = document.getElementById(id);
+            if (el) el.classList.add('visible');
+            const parent = el?.closest('.form-group');
+            if (parent) parent.classList.add('has-error');
+        }
+
+        function hideError(id) {
+            const el = document.getElementById(id);
+            if (el) el.classList.remove('visible');
+            const parent = el?.closest('.form-group');
+            if (parent) parent.classList.remove('has-error');
+            if (parent) parent.classList.add('has-success');
+        }
+
+        function calculateAge(birthDate) {
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const m = today.getMonth() - birthDate.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            return age;
+        }
+
+        // ============================================
+        // PASSWORD STRENGTH
+        // ============================================
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            const fill = document.getElementById('strengthFill');
+            const text = document.getElementById('strengthText');
+
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+            if (/\d/.test(password)) strength++;
+            if (/[^a-zA-Z0-9]/.test(password)) strength++;
+
+            const levels = ['Weak', 'Weak', 'Medium', 'Strong', 'Very Strong'];
+            const classes = ['', 'weak', 'medium', 'strong', 'very-strong'];
+
+            fill.className = 'fill ' + (classes[strength] || '');
+            text.textContent = levels[strength] || 'Weak';
+        });
+
+        // ============================================
+        // PROFILE PICTURE
+        // ============================================
+        function handleProfilePic(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.size > 5 * 1024 * 1024) {
+                showToast('❌ Picha ni kubwa sana (max 5MB)', 'error');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                profilePicture = e.target.result;
+                document.getElementById('profilePreview').innerHTML = 
+                    `<img src="${profilePicture}" alt="Profile">`;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // ============================================
+        // INTERESTS
+        // ============================================
+        function toggleInterest(el) {
+            el.classList.toggle('selected');
+            selectedInterests = Array.from(
+                document.querySelectorAll('.interest-tag.selected')
+            ).map(el => el.textContent.trim());
+        }
+
+        // ============================================
+        // BIO COUNTER
+        // ============================================
+        document.getElementById('bio').addEventListener('input', function() {
+            document.getElementById('bioCount').textContent = this.value.length;
+        });
+
+        // ============================================
+        // REAL-TIME VALIDATION
+        // ============================================
+        let usernameTimeout;
+        document.getElementById('username').addEventListener('input', function() {
+            clearTimeout(usernameTimeout);
+            const username = this.value.trim();
+            if (username.length < 3) return;
+
+            usernameTimeout = setTimeout(async () => {
+                try {
+                    const response = await fetch('/api/auth/check-username', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username })
+                    });
+                    const result = await response.json();
+                    if (result.exists) {
+                        showError('usernameError');
+                        document.getElementById('usernameError').textContent = '❌ Username tayari imetumika.';
+                    } else {
+                        hideError('usernameError');
+                        document.getElementById('usernameError').textContent = 'Username inahitajika.';
+                    }
+                } catch (error) {
+                    // Ignore network errors
+                }
+            }, 500);
+        });
+
+        document.getElementById('email').addEventListener('input', function() {
+            const email = this.value.trim();
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (email && !emailRegex.test(email)) {
+                showError('emailError');
+                document.getElementById('emailError').textContent = '❌ Tafadhali ingiza email sahihi.';
+            } else {
+                hideError('emailError');
+                document.getElementById('emailError').textContent = 'Tafadhali ingiza email sahihi.';
+            }
+        });
+
+        document.getElementById('confirmPassword').addEventListener('input', function() {
+            const password = document.getElementById('password').value;
+            if (this.value && this.value !== password) {
+                showError('confirmError');
+            } else {
+                hideError('confirmError');
+            }
+        });
+
+        // ============================================
+        // FORM SUBMISSION
+        // ============================================
+        async function handleSignup(event) {
+            event.preventDefault();
+            
+            if (isSubmitting) return;
+            
+            if (!validateStep(3)) {
+                showToast('❌ Tafadhali jaza sehemu zote zinazohitajika.', 'error');
+                return;
+            }
+
+            isSubmitting = true;
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.classList.add('loading');
+            submitBtn.disabled = true;
+
+            // Get form data
+            const formData = {
+                full_name: document.getElementById('fullName').value.trim(),
+                username: document.getElementById('username').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                phone: document.getElementById('phone').value.trim(),
+                password: document.getElementById('password').value,
+                date_of_birth: document.getElementById('dob').value,
+                gender: document.getElementById('gender').value,
+                location: document.getElementById('location').value.trim(),
+                bio: document.getElementById('bio').value.trim(),
+                interests: selectedInterests,
+                profile_picture: profilePicture
+            };
+
+            try {
+                const response = await fetch('/api/auth/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Save token and user data
+                    localStorage.setItem('token', result.token);
+                    localStorage.setItem('user', JSON.stringify(result.user));
+                    
+                    // Show success
+                    document.querySelector('.signup-form').style.display = 'none';
+                    document.getElementById('successMessage').style.display = 'block';
+                    
+                    showToast('🎉 Account created successfully!', 'success');
+                    
+                    // Redirect to dashboard after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 2000);
+                } else {
+                    showToast(`❌ ${result.error || 'Error creating account'}`, 'error');
+                    submitBtn.classList.remove('loading');
+                    submitBtn.disabled = false;
+                    isSubmitting = false;
+                }
+            } catch (error) {
+                console.error('Signup error:', error);
+                showToast('❌ Network error. Tafadhali jaribu tena.', 'error');
+                submitBtn.classList.remove('loading');
+                submitBtn.disabled = false;
+                isSubmitting = false;
+            }
+        }
+
+        // ============================================
+        // KEYBOARD NAVIGATION
+        // ============================================
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                if (currentStep < 3) {
+                    nextStep();
+                }
+            }
+        });
+
+        // ============================================
+        // THEME
+        // ============================================
+        const theme = localStorage.getItem('theme');
+        if (theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+        }
+
+        // ============================================
+        // INIT
+        // ============================================
+        // Check if already logged in
+        if (localStorage.getItem('token')) {
+            window.location.href = '/';
+        }
+
+        updateSteps();
+        console.log('💕 TAFUTA MPENZI WAKO - Signup Page Loaded');
+        console.log('📝 Free Trial: Siku 3 za Premium bure!');
+    </script>
+
+</body>
+  </html>
