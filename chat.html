@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>💬 Chats - TAFUTA MPENZI WAKO</title>
+    
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/chat.css">
+    
+    <style>
+        /* Quick fix for chat layout */
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg-primary);
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .chat-app {
+            display: flex;
+            height: 100vh;
+            background: var(--bg-primary);
+        }
+        
+        /* Chat Sidebar */
+        .chat-sidebar {
+            width: 380px;
+            min-width: 280px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            flex-shrink: 0;
+        }
+        
+        .chat-sidebar-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+        
+        .chat-sidebar-header h2 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .chat-sidebar-header h2 span {
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+        
+        .chat-search {
+            position: relative;
+        }
+        
+        .chat-search input {
+            width: 100%;
+            padding: 10px 16px 10px 44px;
+            border: 2px solid var(--border-color);
+            border-radius: 25px;
+            background: var(--bg-input);
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .chat-search input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(255,107,138,0.08);
+        }
+        
+        .chat-search input::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .chat-search .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 18px;
+        }
+        
+        /* Chat Filters */
+        .chat-filters {
+            display: flex;
+            gap: 8px;
+            padding: 10px 20px;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+            overflow-x: auto;
+        }
+        
+        .chat-filters::-webkit-scrollbar {
+            height: 2px;
+        }
+        
+        .chat-filters .filter-btn {
+            padding: 6px 16px;
+            border: none;
+            border-radius: 20px;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .chat-filters .filter-btn:hover {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+        }
+        
+        .chat-filters .filter-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .chat-filters .filter-btn .badge {
+            margin-left: 4px;
+            background: var(--danger);
+            color: white;
+            font-size: 10px;
+            padding: 1px 8px;
+            border-radius: 12px;
+        }
+        
+        /* Chat List */
+        .chat-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 4px 0;
+        }
+        
+        .chat-list::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        .chat-list::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+        
+        /* Chat Item */
+        .chat-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .chat-item:hover {
+            background: var(--hover-bg);
+        }
+        
+        .chat-item.active {
+            background: var(--hover-bg);
+            border-left: 3px solid var(--primary);
+        }
+        
+        .chat-item .avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .chat-item .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .chat-item .avatar .status-dot {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid var(--bg-secondary);
+        }
+        
+        .chat-item .avatar .status-dot.online {
+            background: #4CAF50;
+        }
+        
+        .chat-item .chat-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .chat-item .chat-info .name {
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--text-primary);
+        }
+        
+        .chat-item .chat-info .last-msg {
+            font-size: 13px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .chat-item .chat-meta {
+            flex-shrink: 0;
+            text-align: right;
+            min-width: 40px;
+        }
+        
+        .chat-item .chat-meta .time {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+        
+        .chat-item .chat-meta .unread {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 12px;
+            margin-top: 4px;
+            min-width: 18px;
+            text-align: center;
+        }
+        
+        /* Empty Chat Window */
+        .chat-window-empty {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            text-align: center;
+            padding: 40px;
+            background: var(--bg-primary);
+        }
+        
+        .chat-window-empty .empty-icon {
+            font-size: 80px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+        
+        .chat-window-empty h3 {
+            margin-bottom: 8px;
+        }
+        
+        .chat-window-empty p {
+            color: var(--text-muted);
+            max-width: 300px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .chat-sidebar {
+                width: 100%;
+                min-width: unset;
+            }
+            
+            .chat-window-empty {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="chat-app">
+    
+    <!-- ============================================
+    CHAT SIDEBAR
+    ============================================ -->
+    <div class="chat-sidebar">
+        
+        <!-- Header -->
+        <div class="chat-sidebar-header">
+            <h2>
+                💬 Chats
+                <span id="chatCount">(7)</span>
+            </h2>
+            <div class="chat-search">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="Search for chats and people" oninput="filterChats(this.value)">
+            </div>
+        </div>
+        
+        <!-- Filters -->
+        <div class="chat-filters">
+            <button class="filter-btn active" onclick="filterChatsBy('all', this)">All</button>
+            <button class="filter-btn" onclick="filterChatsBy('unread', this)">Unread <span class="badge" id="unreadBadge">1</span></button>
+            <button class="filter-btn" onclick="filterChatsBy('favorites', this)">Favorites <span class="badge" id="favBadge">4</span></button>
+            <button class="filter-btn" onclick="filterChatsBy('groups', this)">Groups</button>
+        </div>
+        
+        <!-- Chat List -->
+        <div class="chat-list" id="chatList">
+            <!-- Chats zitawekwa hapa na JavaScript -->
+        </div>
+    </div>
+    
+    <!-- ============================================
+    EMPTY CHAT WINDOW
+    ============================================ -->
+    <div class="chat-window-empty" id="emptyChatWindow">
+        <div class="empty-icon">💬</div>
+        <h3>Chagua chat</h3>
+        <p>Chagua mazungumzo kutoka upande wa kushoto ili kuona ujumbe</p>
+    </div>
+    
+</div>
+
+<!-- ============================================
+    JAVASCRIPT
+    ============================================ -->
+<script>
+    // ============================================
+    // DATA - CHATS (Sample Data kama screenshot)
+    // ============================================
+    
+    const chatsData = [
+        {
+            id: 1,
+            name: 'Carolina Niglio',
+            avatar: '👩',
+            lastMessage: 'AZZ',
+            time: '10:30 AM',
+            unread: 0,
+            isOnline: true,
+            isFavorite: true,
+            isGroup: false
+        },
+        {
+            id: 2,
+            name: 'Vincenzo Sorrentino',
+            avatar: '👨',
+            lastMessage: 'It will cost a lot!',
+            time: '9:45 AM',
+            unread: 2,
+            isOnline: false,
+            isFavorite: true,
+            isGroup: false
+        },
+        {
+            id: 3,
+            name: 'Mirko D\'Agnese',
+            avatar: '👨',
+            lastMessage: '0:22',
+            time: 'Yesterday',
+            unread: 0,
+            isOnline: false,
+            isFavorite: false,
+            isGroup: false
+        },
+        {
+            id: 4,
+            name: 'Serena Giardullo',
+            avatar: '👩',
+            lastMessage: 'When you want',
+            time: 'Yesterday',
+            unread: 0,
+            isOnline: true,
+            isFavorite: true,
+            isGroup: false
+        },
+        {
+            id: 5,
+            name: 'Samuele Marigliano',
+            avatar: '👨',
+            lastMessage: 'Sent you 4 photos',
+            time: 'Monday',
+            unread: 0,
+            isOnline: false,
+            isFavorite: true,
+            isGroup: false
+        },
+        {
+            id: 6,
+            name: 'Francesco Vadala',
+            avatar: '👨',
+            lastMessage: 'See you tomorrow',
+            time: 'Monday',
+            unread: 0,
+            isOnline: false,
+            isFavorite: false,
+            isGroup: false
+        },
+        {
+            id: 7,
+            name: 'Desianers Academy',
+            avatar: '🏛️',
+            lastMessage: 'New course available',
+            time: 'Sunday',
+            unread: 0,
+            isOnline: false,
+            isFavorite: false,
+            isGroup: true
+        }
+    ];
+    
+    // ============================================
+    // RENDER CHATS
+    // ============================================
+    
+    let currentFilter = 'all';
+    let searchQuery = '';
+    
+    function renderChats(chats) {
+        const container = document.getElementById('chatList');
+        
+        if (!chats || chats.length === 0) {
+            container.innerHTML = `
+                <div style="text-align:center;padding:40px 20px;color:var(--text-muted);">
+                    <div style="font-size:40px;margin-bottom:10px;">🔍</div>
+                    <h4>Hakuna chats</h4>
+                    <p style="font-size:13px;">${searchQuery ? 'Jaribu kutafuta tofauti' : 'Anza kuongea na watu wapya!'}</p>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = chats.map(chat => `
+            <div class="chat-item" onclick="openChat(${chat.id})" data-id="${chat.id}">
+                <div class="avatar">
+                    ${chat.avatar || '👤'}
+                    <span class="status-dot ${chat.isOnline ? 'online' : 'offline'}"></span>
+                </div>
+                <div class="chat-info">
+                    <div class="name">${chat.name}</div>
+                    <div class="last-msg">${chat.lastMessage || 'Anza mazungumzo...'}</div>
+                </div>
+                <div class="chat-meta">
+                    <div class="time">${chat.time || ''}</div>
+                    ${chat.unread > 0 ? `<div class="unread">${chat.unread}</div>` : ''}
+                </div>
+            </div>
+        `).join('');
+        
+        // Update count
+        document.getElementById('chatCount').textContent = `(${chats.length})`;
+    }
+    
+    // ============================================
+    // FILTER CHATS
+    // ============================================
+    
+    function filterChats(query) {
+        searchQuery = query.toLowerCase().trim();
+        applyFilters();
+    }
+    
+    function filterChatsBy(filter, btn) {
+        currentFilter = filter;
+        
+        // Update active button
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+        
+        applyFilters();
+    }
+    
+    function applyFilters() {
+        let filtered = [...chatsData];
+        
+        // Filter by type
+        if (currentFilter === 'unread') {
+            filtered = filtered.filter(c => c.unread > 0);
+        } else if (currentFilter === 'favorites') {
+            filtered = filtered.filter(c => c.isFavorite);
+        } else if (currentFilter === 'groups') {
+            filtered = filtered.filter(c => c.isGroup);
+        }
+        
+        // Filter by search query
+        if (searchQuery) {
+            filtered = filtered.filter(c => 
+                c.name.toLowerCase().includes(searchQuery) ||
+                (c.lastMessage && c.lastMessage.toLowerCase().includes(searchQuery))
+            );
+        }
+        
+        renderChats(filtered);
+    }
+    
+    // ============================================
+    // OPEN CHAT
+    // ============================================
+    
+    function openChat(chatId) {
+        const chat = chatsData.find(c => c.id === chatId);
+        if (!chat) return;
+        
+        // Mark as active
+        document.querySelectorAll('.chat-item').forEach(el => el.classList.remove('active'));
+        const item = document.querySelector(`.chat-item[data-id="${chatId}"]`);
+        if (item) item.classList.add('active');
+        
+        // Show toast
+        showToast(`💬 Opening chat with ${chat.name}...`, 'info');
+        
+        // Redirect to chat page with user
+        setTimeout(() => {
+            window.location.href = `/chat.html?user=${chatId}&name=${encodeURIComponent(chat.name)}`;
+        }, 500);
+    }
+    
+    // ============================================
+    // TOAST
+    // ============================================
+    
+    function showToast(message, type = 'success') {
+        const existing = document.querySelector('.toast');
+        if (existing) existing.remove();
+        
+        const toast = document.createElement('div');
+        toast.className = `toast ${type} show`;
+        toast.textContent = message;
+        toast.style.cssText = `
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 14px 28px;
+            border-radius: 12px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            box-shadow: var(--shadow-lg);
+            z-index: 9999;
+            max-width: 90%;
+            text-align: center;
+            border-left: 4px solid ${type === 'success' ? '#4CAF50' : type === 'error' ? '#FF4444' : '#2196F3'};
+            animation: slideDown 0.3s ease;
+        `;
+        
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+    
+    // ============================================
+    // THEME SUPPORT
+    // ============================================
+    
+    const theme = localStorage.getItem('theme') || 'dark';
+    if (theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+    }
+    
+    // ============================================
+    // INIT
+    // ============================================
+    
+    // Render chats on load
+    renderChats(chatsData);
+    
+    console.log('💬 Chat page loaded!');
+    console.log('📱 Muonekano kama WhatsApp-style chat list');
+</script>
+
+</body>
+</html>
